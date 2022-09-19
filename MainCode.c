@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-
-void imprimirLinha(FILE * ptr_para_file , int linha_a_ser_impressa_em_bytes){
+void imprimirLinha(FILE * ptr_para_file , long int linha_a_ser_impressa_em_bytes){
 
     //fseek
 
@@ -15,22 +15,34 @@ int numLinhas = 0;
 return numLinhas;
 }
 
-typedef struct {
+typedef struct NoDeArvore {
 
     float chave;
     int linha;
-    NoDeArvore * esquerda;
-    NoDeArvore * Direita;
+    struct NoDeArvore * esquerda;
+    struct NoDeArvore * Direita;
 
-} NoDeArvore;
+};
 
-void registrarABP (NoDeArvore * NoPai , int linhaDeLeitura , float SomaLongitude_Latitude) {
+void registrarABP (struct NoDeArvore * NoPai , int linhaDeLeitura , float SomaLongitude_Latitude) {
 
 
 
 }
 
 int main (void){
+
+    FILE * csvInfo;
+
+    csvInfo = fopen ("Fire-incidents_semicolons.csv","r");
+    if (csvInfo == NULL){
+        printf("Erro ao abrir arquivo");
+        exit(1);
+    }
+
+    int numLinhas = quantidadeDeLinhas (csvInfo);
+
+    float chaves [numLinhas];
 
 
 return 0;
