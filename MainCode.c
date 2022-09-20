@@ -15,7 +15,7 @@ typedef struct NoDeArvore {
 void imprimirLinhas_OrdemCrescente(Arvore* no, long int vetorBytes[], FILE * arquivo){
 
     int caractere;
-    char linhaFile [800];
+    char linhaFile [850];
 
     if(no != NULL){
         imprimirLinhas_OrdemCrescente (no->esquerda,vetorBytes, arquivo);
@@ -37,9 +37,23 @@ void imprimirLinhas_OrdemCrescente(Arvore* no, long int vetorBytes[], FILE * arq
 
 }
 
-void imprimirLinha (int numBytes, FILE * arquivo){
+void removerNos (Arvore* no){
 
-    char linhaFile [800];
+    if(no != NULL){
+        removerNos (no->esquerda);
+
+        if (no->direita != NULL){
+            removerNos(no->direita);
+        }
+
+    free(no);
+
+}
+}
+
+void imprimirLinha (long int numBytes, FILE * arquivo){
+
+    char linhaFile [850];
 
     fseek(arquivo, numBytes, SEEK_SET);
 
@@ -83,79 +97,114 @@ int main (void){
     FILE * csvInfo;
 
     Arvore * noPai = NULL;
-
-    csvInfo = fopen ("Fire-Incidents_semicolon - Copy.csv","r");
-    if (csvInfo == NULL){
-        printf("Erro ao abrir arquivo");
-        exit(1);
-    }
-
-    int numLinhas = quantidadeDeLinhas (csvInfo);
+    char nomeArquivo [200];
+    int numLinhas;
     int nBytes = 0;
     long int posLinhaBytes[MAX];
     posLinhaBytes[0]=0;
 
-    char linhaDoArquivo[800];
+    char linhaDoArquivo[850];
 
     long int localLinha = 1;
     float somaColunas = 0;
 
-    fseek(csvInfo,0,SEEK_SET);
+    char * linhaSeparada;
 
-    while(fgets(linhaDoArquivo,sizeof(linhaDoArquivo)+1,csvInfo)){
-        
-        nBytes = nBytes + strlen(linhaDoArquivo);
-        posLinhaBytes[(localLinha)] = nBytes;
+    int escolha = 0;
+    do{
+    printf("Qual opcao deseja realizar?\n\t1 = Carregar arquivo\n\t2 = Imprimir relatorio\n\t3 = Sair do programa\n");
+    scanf("%d", &escolha);
 
-        char * linhaSeparada;
+    switch (escolha)
+    {
+    case 1:
 
-        if (localLinha > 1){
+        printf("Qual arquivo a ser aberto?\n");
 
-            somaColunas = 0;
+        scanf("%s", nomeArquivo);
 
-            linhaSeparada = strtok(linhaDoArquivo,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            linhaSeparada = strtok(NULL,";");
-            // Comando abaixo chega em Latitude
-            linhaSeparada = strtok(NULL,";");
+        csvInfo = fopen (nomeArquivo,"r");
+        if (csvInfo == NULL){
+        printf("Erro ao abrir arquivo");
+        exit(1);
+         }
 
-            linhaSeparada[2]='.';
-            somaColunas = strtof(linhaSeparada,NULL);
+        numLinhas = quantidadeDeLinhas (csvInfo);
 
-            linhaSeparada = strtok(NULL,";");
+        fseek(csvInfo,0,SEEK_SET);
 
-            linhaSeparada[2]='.';
-            somaColunas += strtof(linhaSeparada,NULL);
+        while(fgets(linhaDoArquivo,sizeof(linhaDoArquivo)+1,csvInfo)){
 
-            noPai = registrarABP(noPai,localLinha, somaColunas);
-            localLinha++;
+            nBytes = nBytes + strlen(linhaDoArquivo);
+            posLinhaBytes[(localLinha)] = nBytes;
+
+
+            if (localLinha > 1){
+
+                somaColunas = 0;
+
+                linhaSeparada = strtok(linhaDoArquivo,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                linhaSeparada = strtok(NULL,";");
+                // Comando abaixo chega em Latitude
+                linhaSeparada = strtok(NULL,";");
+
+                linhaSeparada[2]='.';
+                somaColunas = strtof(linhaSeparada,NULL);
+
+                linhaSeparada = strtok(NULL,";");
+
+                linhaSeparada[2]='.';
+                somaColunas += strtof(linhaSeparada,NULL);
+
+                noPai = registrarABP(noPai,localLinha, somaColunas);
+                localLinha++;
 
         }
 
         else {
             localLinha++;
         }
+        }
+
+        break;
+
+        case 2:
+        imprimirLinhas_OrdemCrescente(noPai, posLinhaBytes, csvInfo);
+        break;
+
+        case 3:
+        removerNos(noPai);
+        break;
+
+
+
+    default:
+    printf("Opcao incorreta");
+    escolha = 0;
+        break;
     }
+
+
+
 
 
 // Printar - Excluir
 
-    imprimirLinhas_OrdemCrescente(noPai, posLinhaBytes, csvInfo);
-
-    printf("fim?");
+ } while (escolha == 0 || escolha == 1 || escolha == 2);
 
 return 0;
 }
