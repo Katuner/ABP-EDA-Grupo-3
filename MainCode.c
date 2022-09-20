@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define MAX 20000
 typedef struct NoDeArvore {
 
     float chave;
@@ -17,7 +18,7 @@ void imprimirLinhas_OrdemCrescente(Arvore* no, long int vetorBytes[], FILE * arq
 
     if(no != NULL){
         imprimirLinhas_OrdemCrescente (no->esquerda,vetorBytes, arquivo);
-        
+
         fseek(arquivo, vetorBytes[no->linha], SEEK_SET);
 
         while ((caractere = fgetc(arquivo)) != '\n'){
@@ -28,7 +29,7 @@ void imprimirLinhas_OrdemCrescente(Arvore* no, long int vetorBytes[], FILE * arq
         if (no->direita != NULL){
             imprimirLinhas_OrdemCrescente (no->direita,vetorBytes, arquivo);
         }
-        
+
     }
 
 }
@@ -50,7 +51,7 @@ Arvore* registrarABP (Arvore * noPai, int linhaDeLeitura , float SomaLongitude_L
     if(noPai == NULL){
         noPai= (Arvore*)malloc(sizeof(Arvore));
         noPai->chave = SomaLongitude_Latitude;
-        noPai->linha = linhaDeLeitura; 
+        noPai->linha = linhaDeLeitura;
         noPai->esquerda = NULL;
         noPai->direita = NULL;
     }
@@ -69,32 +70,31 @@ int main (void){
 
     Arvore * noPai = NULL;
 
-    csvInfo = fopen ("Fire-incidents_semicolons.csv","r");
+    csvInfo = fopen ("Fire-Incidents_semicolon - Copy.csv","r");
     if (csvInfo == NULL){
         printf("Erro ao abrir arquivo");
         exit(1);
     }
 
     int numLinhas = quantidadeDeLinhas (csvInfo);
-    char bytes[800];
-    long int nBytes = 0, posLinhaBytes[numLinhas];
-
-    for (int i = 0; i < numLinhas; i++) {
-        fscanf(csvInfo,"%[^\n]\n", bytes);
-        nBytes = nBytes + strlen(bytes);  
-        posLinhaBytes[i] = nBytes+1;
-    }  
+    int nBytes = 0;
+    long int posLinhaBytes[MAX];
 
     char linhaDoArquivo[800];
 
     int localLinha = 1;
     float somaColunas = 0;
 
+    fseek (csvInfo,0,SEEK_SET);
+
     while(fgets(linhaDoArquivo,sizeof(linhaDoArquivo)+1,csvInfo)){
+        
+        nBytes = nBytes + strlen(linhaDoArquivo);
+        posLinhaBytes[localLinha-1] = nBytes+1;
 
         char * linhaSeparada;
 
-        if (localLinha > 2){
+        if (localLinha > 1){
 
             somaColunas = 0;
 
@@ -117,15 +117,16 @@ int main (void){
             // Comando abaixo chega em Latitude
             linhaSeparada = strtok(NULL,";");
 
-            linhaSeparada[3]='.';
-            somaColunas = atof(linhaSeparada);
+            linhaSeparada[2]='.';
+            somaColunas = strtof(linhaSeparada,NULL);
 
             linhaSeparada = strtok(NULL,";");
 
-            linhaSeparada[3]='.';
-            somaColunas += atof(linhaSeparada);
+            linhaSeparada[2]='.';
+            somaColunas += strtof(linhaSeparada,NULL);
 
-            registrarABP(noPai,localLinha, somaColunas);
+            noPai = registrarABP(noPai,localLinha, somaColunas);
+            localLinha++;
 
         }
 
@@ -137,7 +138,13 @@ int main (void){
 
 // Printar - Excluir
 
-    imprimirLinhas_OrdemCrescente (noPai, posLinhaBytes, csvInfo);
+    for (int i=0;i<numLinhas;i++){
+        printf("%ld\n",posLinhaBytes[i]);
+    }
+
+    imprimirLinhas_OrdemCrescente(noPai, posLinhaBytes, csvInfo);
+
+    printf("fim?");
 
 return 0;
 }
