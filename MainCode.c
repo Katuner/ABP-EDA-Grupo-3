@@ -2,9 +2,34 @@
 #include <string.h>
 #include <stdlib.h>
 
-void imprimirLinha(FILE * ptr_para_file , long int linha_a_ser_impressa_em_bytes){
+typedef struct NoDeArvore {
 
-    //fseek
+    float chave;
+    long int linha;
+    struct NoDeArvore * esquerda;
+    struct NoDeArvore * direita;
+
+} Arvore ;
+
+void imprimirLinhas_OrdemCrescente(Arvore* no, long int vetorBytes[], FILE * arquivo){
+
+    int caractere;
+
+    if(no != NULL){
+        imprimirLinhas_OrdemCrescente (no->esquerda,vetorBytes, arquivo);
+        
+        fseek(arquivo, vetorBytes[no->linha], SEEK_SET);
+
+        while ((caractere = fgetc(arquivo)) != '\n'){
+            printf ("%c", caractere);
+        }
+        printf("\n");
+
+        if (no->direita != NULL){
+            imprimirLinhas_OrdemCrescente (no->direita,vetorBytes, arquivo);
+        }
+        
+    }
 
 }
 
@@ -19,15 +44,6 @@ while ((letra = fgetc(ptr_para_file)) != EOF ){
 
 return numLinhas;
 }
-
-typedef struct NoDeArvore {
-
-    float chave;
-    long int linha;
-    struct NoDeArvore * esquerda;
-    struct NoDeArvore * direita;
-
-} Arvore ;
 
 Arvore* registrarABP (Arvore * noPai, int linhaDeLeitura , float SomaLongitude_Latitude) {
 
@@ -60,6 +76,14 @@ int main (void){
     }
 
     int numLinhas = quantidadeDeLinhas (csvInfo);
+    char bytes[800];
+    long int nBytes = 0, posLinhaBytes[numLinhas];
+
+    for (int i = 0; i < numLinhas; i++) {
+        fscanf(csvInfo,"%[^\n]\n", bytes);
+        nBytes = nBytes + strlen(bytes);  
+        posLinhaBytes[i] = nBytes+1;
+    }  
 
     char linhaDoArquivo[800];
 
@@ -111,6 +135,9 @@ int main (void){
     }
 
 
+// Printar - Excluir
+
+    imprimirLinhas_OrdemCrescente (noPai, posLinhaBytes, csvInfo);
 
 return 0;
 }
