@@ -6,7 +6,7 @@
 typedef struct NoDeArvore {
 
     float chave;
-    long int linha;
+    int linha;
     struct NoDeArvore * esquerda;
     struct NoDeArvore * direita;
 
@@ -15,15 +15,17 @@ typedef struct NoDeArvore {
 void imprimirLinhas_OrdemCrescente(Arvore* no, long int vetorBytes[], FILE * arquivo){
 
     int caractere;
+    char linhaFile [800];
 
     if(no != NULL){
         imprimirLinhas_OrdemCrescente (no->esquerda,vetorBytes, arquivo);
 
         fseek(arquivo, vetorBytes[no->linha], SEEK_SET);
 
-        while ((caractere = fgetc(arquivo)) != '\n'){
-            printf ("%c", caractere);
-        }
+        printf ("%s", fgets(linhaFile, sizeof(linhaFile), arquivo));
+        //while ((caractere = fgetc(arquivo)) != '\n'){
+        //    printf ("%c", caractere);
+        //}
         printf("\n");
 
         if (no->direita != NULL){
@@ -46,7 +48,7 @@ while ((letra = fgetc(ptr_para_file)) != EOF ){
 return numLinhas;
 }
 
-Arvore* registrarABP (Arvore * noPai, int linhaDeLeitura , float SomaLongitude_Latitude) {
+Arvore* registrarABP (Arvore * noPai, long int linhaDeLeitura , float SomaLongitude_Latitude) {
 
     if(noPai == NULL){
         noPai= (Arvore*)malloc(sizeof(Arvore));
@@ -82,15 +84,16 @@ int main (void){
 
     char linhaDoArquivo[800];
 
-    int localLinha = 1;
+    long int localLinha = 1;
     float somaColunas = 0;
 
-    fseek (csvInfo,0,SEEK_SET);
+    fseek(csvInfo,0,SEEK_SET);
 
     while(fgets(linhaDoArquivo,sizeof(linhaDoArquivo)+1,csvInfo)){
+        printf("%d\n",localLinha);
         
         nBytes = nBytes + strlen(linhaDoArquivo);
-        posLinhaBytes[localLinha-1] = nBytes+1;
+        posLinhaBytes[(localLinha-1)] = nBytes;
 
         char * linhaSeparada;
 
