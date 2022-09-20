@@ -20,19 +20,31 @@ void imprimirLinhas_OrdemCrescente(Arvore* no, long int vetorBytes[], FILE * arq
     if(no != NULL){
         imprimirLinhas_OrdemCrescente (no->esquerda,vetorBytes, arquivo);
 
-        fseek(arquivo, vetorBytes[no->linha], SEEK_SET);
+        //fseek(arquivo, vetorBytes[no->linha], SEEK_SET);
 
-        printf ("%s", fgets(linhaFile, sizeof(linhaFile), arquivo));
+        //printf ("%s", fgets(linhaFile, sizeof(linhaFile), arquivo));
         //while ((caractere = fgetc(arquivo)) != '\n'){
         //    printf ("%c", caractere);
         //}
-        printf("\n");
+        //printf("\n");
+        imprimirLinha(vetorBytes[no->linha], arquivo);
 
         if (no->direita != NULL){
             imprimirLinhas_OrdemCrescente (no->direita,vetorBytes, arquivo);
         }
 
     }
+
+}
+
+void imprimirLinha (int numBytes, FILE * arquivo){
+
+    char linhaFile [800];
+
+    fseek(arquivo, numBytes, SEEK_SET);
+
+    printf ("%s", fgets(linhaFile, sizeof(linhaFile), arquivo));
+    printf("\n");
 
 }
 
@@ -140,10 +152,6 @@ int main (void){
 
 
 // Printar - Excluir
-
-    for (int i=0;i<numLinhas;i++){
-        printf("%ld\n",posLinhaBytes[i]);
-    }
 
     imprimirLinhas_OrdemCrescente(noPai, posLinhaBytes, csvInfo);
 
