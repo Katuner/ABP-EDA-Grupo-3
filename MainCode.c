@@ -9,7 +9,13 @@ void imprimirLinha(FILE * ptr_para_file , long int linha_a_ser_impressa_em_bytes
 }
 
 int quantidadeDeLinhas (FILE * ptr_para_file){
-int numLinhas = 0;
+int numLinhas = 0, letra;
+
+while ((letra = fgetc(ptr_para_file)) != EOF ){
+    if (letra == '\n'){
+        numLinhas++;
+    }
+}
 
 
 return numLinhas;
@@ -24,7 +30,7 @@ typedef struct NoDeArvore {
 
 };
 
-void registrarABP (struct NoDeArvore * NoPai , int linhaDeLeitura , float SomaLongitude_Latitude) {
+void registrarABP (int linhaDeLeitura , float SomaLongitude_Latitude) {
 
 
 
@@ -42,7 +48,55 @@ int main (void){
 
     int numLinhas = quantidadeDeLinhas (csvInfo);
 
-    float chaves [numLinhas];
+    char linhaDoArquivo[800];
+
+    int linhaDoArquivo = 1;
+    float somaColunas = 0;
+
+    while(fgets(linhaDoArquivo,sizeof(linhaDoArquivo)+1,csvInfo)){
+
+        char * linhaSeparada;
+
+        if (linhaDoArquivo > 2){
+
+            somaColunas = 0;
+
+            linhaSeparada = strtok(linhaDoArquivo,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            linhaSeparada = strtok(NULL,";");
+            // Comando abaixo chega em Latitude
+            linhaSeparada = strtok(NULL,";");
+
+            linhaSeparada[3]='.';
+            somaColunas = atof(linhaSeparada);
+
+            linhaSeparada = strtok(NULL,";");
+
+            linhaSeparada[3]='.';
+            somaColunas += atof(linhaSeparada);
+
+            registrarABP(linhaDoArquivo, somaColunas);
+
+        }
+
+        else {
+            linhaDoArquivo++;
+        }
+    }
+
 
 
 return 0;
