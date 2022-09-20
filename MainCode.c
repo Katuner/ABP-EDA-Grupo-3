@@ -17,28 +17,41 @@ while ((letra = fgetc(ptr_para_file)) != EOF ){
     }
 }
 
-
 return numLinhas;
 }
 
 typedef struct NoDeArvore {
 
     float chave;
-    int linha;
+    long int linha;
     struct NoDeArvore * esquerda;
-    struct NoDeArvore * Direita;
+    struct NoDeArvore * direita;
 
-};
+} Arvore ;
 
-void registrarABP (int linhaDeLeitura , float SomaLongitude_Latitude) {
+Arvore* registrarABP (Arvore * noPai, int linhaDeLeitura , float SomaLongitude_Latitude) {
 
-
-
+    if(noPai == NULL){
+        noPai= (Arvore*)malloc(sizeof(Arvore));
+        noPai->chave = SomaLongitude_Latitude;
+        noPai->linha = linhaDeLeitura; 
+        noPai->esquerda = NULL;
+        noPai->direita = NULL;
+    }
+    else if(SomaLongitude_Latitude <= noPai->chave){
+        noPai->esquerda = registrarABP(noPai->esquerda,linhaDeLeitura,SomaLongitude_Latitude);
+    }
+    else{
+        noPai->direita = registrarABP(noPai->direita,linhaDeLeitura,SomaLongitude_Latitude);
+    }
+    return noPai;
 }
 
 int main (void){
 
     FILE * csvInfo;
+
+    Arvore * noPai = NULL;
 
     csvInfo = fopen ("Fire-incidents_semicolons.csv","r");
     if (csvInfo == NULL){
@@ -50,14 +63,14 @@ int main (void){
 
     char linhaDoArquivo[800];
 
-    int linhaDoArquivo = 1;
+    int localLinha = 1;
     float somaColunas = 0;
 
     while(fgets(linhaDoArquivo,sizeof(linhaDoArquivo)+1,csvInfo)){
 
         char * linhaSeparada;
 
-        if (linhaDoArquivo > 2){
+        if (localLinha > 2){
 
             somaColunas = 0;
 
@@ -88,12 +101,12 @@ int main (void){
             linhaSeparada[3]='.';
             somaColunas += atof(linhaSeparada);
 
-            registrarABP(linhaDoArquivo, somaColunas);
+            registrarABP(noPai,localLinha, somaColunas);
 
         }
 
         else {
-            linhaDoArquivo++;
+            localLinha++;
         }
     }
 
