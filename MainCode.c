@@ -93,6 +93,7 @@ int main (void){
     int numLinhas = quantidadeDeLinhas (csvInfo);
     int nBytes = 0;
     long int posLinhaBytes[MAX];
+    posLinhaBytes[0]=0;
 
     char linhaDoArquivo[800];
 
@@ -102,10 +103,9 @@ int main (void){
     fseek(csvInfo,0,SEEK_SET);
 
     while(fgets(linhaDoArquivo,sizeof(linhaDoArquivo)+1,csvInfo)){
-        printf("%d\n",localLinha);
         
         nBytes = nBytes + strlen(linhaDoArquivo);
-        posLinhaBytes[(localLinha-1)] = nBytes;
+        posLinhaBytes[(localLinha)] = nBytes;
 
         char * linhaSeparada;
 
